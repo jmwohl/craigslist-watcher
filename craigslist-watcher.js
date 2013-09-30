@@ -1,8 +1,3 @@
-// Project TODOS:
-// - support for sending from emails other than gmail
-// - command line options: nearby results
-// - make NOTIFY_EMAIL optional
-
 // Modules
 var craigslistscraper = require('./craigslistscraper');
 var fs = require('node-fs');

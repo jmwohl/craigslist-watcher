@@ -1,0 +1,19 @@
+{
+  "name": "craigslist-watcher",
+  "version": "0.1.0",
+  "author": "Dennis Hodapp <thehodapp@gmail.com>",
+  "description": "A way to keep track of new Craigslist postings without ever having to check Craigslist manually",
+  "keywords": ["craigslist", "email", "notification"],
+  "main": "./craigslist-watcher",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thehodapp/craigslist-watcher.git"
+  },
+  "dependencies": {
+    "async": ">= 0.2.5",
+    "cheerio": ">= 0.12.2",
+    "node-fs":   ">= 0.1.7",
+    "nodemailer":   ">= 0.5.2",
+    "request":   ">= 2.27.0"
+  }
+}
