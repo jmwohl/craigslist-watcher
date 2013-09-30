@@ -1,7 +1,7 @@
 craigslist-watcher
 ==================
 
-    Usage: craigslist-watcher.js [options] CITY_SUBDOMAIN SENDER_EMAIL SENDER_PASS NOTIFY_EMAIL SEARCH_STRINGS...
+    Usage: craigslist-watcher CITY_SUBDOMAIN SENDER_EMAIL SENDER_PASS NOTIFY_EMAIL SEARCH_STRINGS...
 
 A way to keep track of new Craigslist postings without ever having to check Craigslist manually.
 
