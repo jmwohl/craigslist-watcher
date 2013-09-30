@@ -13,7 +13,7 @@ var baseUrl = '';
 var mailSenderEmail = '';
 var mailSenderPass = '';
 var notifyEmail = '';
-var queries = []; //['homebrewing', 'homebrew', 'home brew beer']; // Search strings
+var queries = []; // Search strings
 var queryResults = [];
 var dataPath = '';
 var dataDirName = 'craigslist-watcher';
@@ -81,12 +81,12 @@ var processResults = function() {
   var results = [];
   var emailMessage = "The following craigslist posts are new:\n";
 
+  // Search for each query and compile results
   console.log("Processing results...");
   for (var i = 0; i < queryResults.length; i++) {
     var match = false;
     for (var j = 0; j < dataArr.length; j++) {
       if(queryResults[i].href === dataArr[j].href) {
-// Search for each query and compile results
         match = true;
         break;
       }
