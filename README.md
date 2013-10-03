@@ -1,7 +1,9 @@
 craigslist-watcher
 ==================
-
-    Usage: craigslist-watcher CITY_SUBDOMAIN SENDER_EMAIL SENDER_PASS NOTIFY_EMAIL SEARCH_STRINGS...
+ 
+```
+Usage: craigslist-watcher CITY_SUBDOMAIN SENDER_EMAIL SENDER_PASS NOTIFY_EMAIL SEARCH_STRINGS...
+```
 
 A way to keep track of new Craigslist postings without ever having to check Craigslist manually.
 
@@ -13,7 +15,10 @@ I am not responsible for any harm occured while using this code. There may be le
 
 ### Installation ###
 You can run:
-    npm install craigslist-watcher
+
+```
+npm install -g craigslist-watcher
+```
 
 or you can clone this git repo and run the install.sh script with root privileges to place the installation in /usr/local and a symlink in /usr/local/bin.
 
@@ -21,6 +26,8 @@ or you can clone this git repo and run the install.sh script with root privilege
 
 craigslist-watcher is not a daemon, so you must use some kind of scheduling tool to run it every once in a while. I use cron to run craigslist-watcher every 5 minutes.
 
-Example:
+Example crontab (run ```crontab -e```):
 
-    */5 * * * * /usr/local/bin/craigslist-watcher tulsa example@example.com password123 notifyaddress@example.com "ford f-150" "inspiron" "condenser microphone" "yamaha keyboard"
+```
+*/5 * * * * /usr/local/bin/craigslist-watcher tulsa example@example.com password123 notifyaddress@example.com "ford f-150" "inspiron" "condenser microphone" "yamaha keyboard"
+```
