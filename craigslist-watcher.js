@@ -1,3 +1,5 @@
+process.chdir(__dirname);
+
 // Modules
 var craigslistscraper = require('./craigslistscraper');
 var fs = require('node-fs');
