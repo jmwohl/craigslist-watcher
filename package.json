@@ -5,7 +5,7 @@
   "description": "A way to keep track of new Craigslist postings without ever having to check Craigslist manually",
   "keywords": ["craigslist", "email", "notification"],
   "bin": {
-    "./craigslist-watcher"
+    "craigslist-watcher": "./craigslist-watcher"
   },
   "repository": {
     "type": "git",
