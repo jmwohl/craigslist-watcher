@@ -1,6 +1,6 @@
 {
   "name": "craigslist-watcher",
-  "version": "0.1.6",
+  "version": "0.1.8",
   "author": "Dennis Hodapp <thehodapp@gmail.com>",
   "description": "A way to keep track of new Craigslist postings without ever having to check Craigslist manually",
   "keywords": ["craigslist", "email", "notification"],

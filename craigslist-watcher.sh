@@ -1,5 +1,5 @@
 #!/bin/bash
 #
 # Convenience script
-cd "$(dirname "$0")"
+cd $(dirname $(readlink -f $0))
 node craigslist-watcher.js "$@"
