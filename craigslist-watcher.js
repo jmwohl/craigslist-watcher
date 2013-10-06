@@ -95,16 +95,15 @@ var processResults = function() {
   }
 
   if (results.length > 0) {
-    // add new results to datafile (and email message) and write to disk
+
+    // Create email string
+    
     for (var i = 0; i < results.length; i++) {
-      dataArr.push(results[i]);
       emailMessage += '<p>' + results[i].date + ' - ' + '<a href="' + results[i].href + '">' + results[i].text + '</a> - ';
       emailMessage += results[i].price + ' ' + results[i].loc + '</p>';
     }
-    var jsonResults = JSON.stringify(dataArr);
-    fs.writeFileSync(dataFilePath, jsonResults);
-  
-    // setup e-mail data with unicode symbols
+
+    // setup e-mail options
   
     mailOptions = {
       from: mailSenderEmail, // sender address
@@ -122,8 +121,15 @@ var processResults = function() {
       }
     }
   
-    // email results
-    mailer.sendMyMail(mailOptions, transportOptions);
+    // email results. If email fails, do not add results to data file
+    if (mailer.sendMyMail(mailOptions, transportOptions)) {
+      // add new results to datafile
+      for (var i = 0; i < results.length; i++) {
+        dataArr.push(results[i]);
+      }
+      var jsonResults = JSON.stringify(dataArr);
+      fs.writeFileSync(dataFilePath, jsonResults);
+    }
   }
 }
 

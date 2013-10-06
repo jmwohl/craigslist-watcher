@@ -29,5 +29,9 @@ exports.sendMyMail = function(mailOptions, transportOptions) {
     }
   
     smtpTransport.close(); // shut down the connection pool, no more messages
+    if (error) {
+      return false;
+    }
+    return true;
   });
 }
