@@ -18,8 +18,8 @@ var dataDirName = 'craigslist-watcher';
 var dataFileName = 'data';
 var dataFilePath = '';
 var filename = __filename.replace(/.*\//,'');
-var usage = "\n" + filename + " - check Craigslist for new posts based on search terms and email new posts\n";
-usage = usage + "Usage: " + filename + " [options] CITY_SUBDOMAIN SENDER_EMAIL SENDER_PASS NOTIFY_EMAIL SEARCH_STRINGS...";
+var usage = "\ncraigslist-watcher - check Craigslist for new posts based on search terms and email new posts\n";
+usage = usage + "Usage: craigslist-watcher [options] CITY_SUBDOMAIN SENDER_EMAIL SENDER_PASS NOTIFY_EMAIL SEARCH_STRINGS...";
 
 // Parse arguments
 if (process.argv.length < 7) {
