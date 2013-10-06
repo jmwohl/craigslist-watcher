@@ -3,3 +3,4 @@ Project TODOS:
 - command line options: nearby results
 - make NOTIFY_EMAIL optional
 - do not store results if email fails
+- $$$ of results and date

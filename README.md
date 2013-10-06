@@ -13,7 +13,12 @@ This tool is a simple node.js script you can run from the terminal to keep track
 
 I am not responsible for any harm occured while using this code. There may be legal consequences of using it in an improper way.
 
+### Some current limitations ###
+
+I'm not entirely sure if the SENDER_EMAIL field will work with email addresses not using gmail. If someone could let me know what works or doesn't work for them that would be appreciated.
+
 ### Installation ###
+
 You can run:
 
 ```
