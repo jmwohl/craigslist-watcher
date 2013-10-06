@@ -11,10 +11,20 @@ exports.query = function(baseUrl, searchString, resultProcessor, callback) {
     uri: searchUrl
   }, function(error, response, body) {
     var $ = cheerio.load(body);
-    $("#toc_rows p.row span.pl > a").each(function() {
-      var link = $(this);
+
+    $('#toc_rows p.row').each(function() {
+      var row = $(this);
+      var date = row.find('span.date').first().text();
+      console.log(date);
+      var link = row.find('span.pl > a').first();
       var text = link.text();
-      var href = link.attr("href");
+      console.log(text);
+      var href = link.attr('href');
+      console.log(href);
+      var price = row.find('span.price').first().text();
+      console.log(price);
+      var loc = row.find('span.pnr small').first().text();
+      console.log(loc);
 
       // check if href is relative
       // for now, let's not include "Nearby area" results
@@ -24,8 +34,25 @@ exports.query = function(baseUrl, searchString, resultProcessor, callback) {
       } else {
         return false;
       }
-      resultProcessor({text: text, href: href});
+      resultProcessor({date: date, text: text, href: href, price: price, loc: loc});
     }); 
     callback();
+//
+//    $('#toc_rows p.row span.pl > a').each(function() {
+//      var link = $(this);
+//      var text = link.text();
+//      var href = link.attr('href');
+//
+//      // check if href is relative
+//      // for now, let's not include "Nearby area" results
+//      // TODO: flag if nearby results should be included
+//      if (href.match(/^(\/|\.\.\/)/)) {
+//        href = baseUrl + href;
+//      } else {
+//        return false;
+//      }
+//      resultProcessor({text: text, href: href});
+//    }); 
+//    callback();
   });
 }

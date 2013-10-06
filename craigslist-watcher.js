@@ -98,7 +98,8 @@ var processResults = function() {
     // add new results to datafile (and email message) and write to disk
     for (var i = 0; i < results.length; i++) {
       dataArr.push(results[i]);
-      emailMessage += "\n" + results[i].text + " - " + results[i].href;
+      emailMessage += '<p>' + results[i].date + ' - ' + '<a href="' + results[i].href + '">' + results[i].text + '</a> - ';
+      emailMessage += results[i].price + ' ' + results[i].loc + '</p>';
     }
     var jsonResults = JSON.stringify(dataArr);
     fs.writeFileSync(dataFilePath, jsonResults);
@@ -109,7 +110,8 @@ var processResults = function() {
       from: mailSenderEmail, // sender address
       to: notifyEmail, // list of receivers
       subject: "Craigslist Updates", // Subject line
-      text: emailMessage, // plaintext body
+      //text: emailMessage, // plaintext body
+      html: emailMessage
     }
 
     transportOptions = {
@@ -127,7 +129,7 @@ var processResults = function() {
 
 async.each(queries, function(q, callback) {
   craigslistscraper.query(baseUrl, q, function(results) {
-    queryResults.push({text: results.text, href: results.href});
+    queryResults.push({date: results.date, text: results.text, href: results.href, price: results.price, loc: results.loc});
   }, callback);
 }, function(err) {
   if (!isEmpty(err)) {
