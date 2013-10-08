@@ -15,16 +15,11 @@ exports.query = function(baseUrl, searchString, resultProcessor, callback) {
     $('#toc_rows p.row').each(function() {
       var row = $(this);
       var date = row.find('span.date').first().text();
-      console.log(date);
       var link = row.find('span.pl > a').first();
       var text = link.text();
-      console.log(text);
       var href = link.attr('href');
-      console.log(href);
       var price = row.find('span.price').first().text();
-      console.log(price);
       var loc = row.find('span.pnr small').first().text();
-      console.log(loc);
 
       // check if href is relative
       // for now, let's not include "Nearby area" results
