@@ -28,12 +28,17 @@ or you can clone this git repo and run the install.sh script with root privilege
 
 ### How I use it (for maximum effectivness)
 
-craigslist-watcher is not a daemon, so you must use some kind of scheduling tool to run it every once in a while. I use cron to run craigslist-watcher every 5 minutes.
+craigslist-watcher is not a daemon, so you must use some kind of scheduling tool to run it every once in a while. I use cron to run craigslist-watcher every 5 minutes.  
+One annoying thing about cron is that it doesn't always keep your environment so you will likely have to place the following line before the command:
 
-Example crontab (run ```crontab -e```):
+```export PATH=$PATH:/usr/local/bin;```
+
+so that the path to the craigslist-watcher binary is available to cron.
+
+Here's an example crontab setup. First, run ```crontab -e``` and you'll add a line like this:
 
 ```
-*/5 * * * * /usr/local/bin/craigslist-watcher tulsa example@example.com password123 notifyaddress@example.com "ford f-150" "inspiron" "condenser microphone" "yamaha keyboard"
+*/5 * * * * /usr/local/bin/craigslist-watcher export PATH=$PATH:/usr/local/bin; tulsa example@example.com password123 notifyaddress@example.com "ford f-150" "inspiron" "condenser microphone" "yamaha keyboard"
 ```
 
 ### Bugs and Features
