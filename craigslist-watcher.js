@@ -144,8 +144,11 @@ if (!exists) {
 // Run queries with craigslistscraper
 async.each(config.searches, function(q, callback) {
   baseUrl = 'http://' + q.location + '.craigslist.org';
+  // default to not include nearby
   includeNearby = q.nearby || false;
-  craigslistscraper.query(baseUrl, q.category, q.term, includeNearby, function(results) {
+  // default to for sale categories
+  category = q.category || "sss";
+  craigslistscraper.query(baseUrl, category, q.term, includeNearby, function(results) {
     queryResults.push({
       date: results.date,
       text: results.text,
