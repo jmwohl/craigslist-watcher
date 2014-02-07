@@ -38,7 +38,7 @@ exports.query = function(baseUrl, category, searchString, includeNearby, resultP
       // console.log({date: date, text: text, href: href, price: price, loc: loc});
       resultProcessor({date: date, text: text, href: href, price: price, loc: loc});
     });
-    console.log("TOTAL: ", count);
+    console.log("TOTAL RESULTS: ", count);
     callback();
   });
 }

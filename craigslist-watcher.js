@@ -1,25 +1,27 @@
 process.chdir(__dirname);
 
+var configPath = process.argv[2] || './config';
+
 // Modules
 var craigslistscraper = require('./craigslist-scraper'),
   fs = require('node-fs'),
   async = require('async'),
   nodemailer = require('nodemailer'),
-  config = require('./config');
+  config = require(configPath);
 
 // Variables
 var baseUrl = '',
-    mailSenderEmail = config.smtp.address,
-    mailSenderPass = config.smtp.pass,
-    notifyEmail = config.to.email,
-    queries = []; // Search string,
-    queryResults = [],
-    dataPath = '',
-    dataDirName = 'craigslist-watcher',
-    dataFileName = 'data',
-    dataFilePath = '',
-    filename = __filename.replace(/.*\//, ''),
-    usage = '\ncraigslist-watcher - check Craigslist for new posts based on search terms and email new posts\n';
+  mailSenderEmail = config.smtp.address,
+  mailSenderPass = config.smtp.pass,
+  notifyEmail = config.to.email,
+  queries = []; // Search string,
+queryResults = [],
+dataPath = '',
+dataDirName = 'craigslist-watcher',
+dataFileName = 'data',
+dataFilePath = '',
+filename = __filename.replace(/.*\//, ''),
+usage = '\ncraigslist-watcher - check Craigslist for new posts based on search terms and email new posts\n';
 
 
 usage = usage + 'Usage: craigslist-watcher [options] CITY_SUBDOMAIN SENDER_EMAIL SENDER_PASS NOTIFY_EMAIL SEARCH_STRINGS...';
@@ -100,11 +102,12 @@ function processResults() {
   }
 
   if (results.length > 0) {
-    console.log('Found new results');
+    console.log('Found ' + results.length + 'new results');
     emailResults(results);
+  } else {
+    console.log('No new results');
   }
 }
-
 
 
 
@@ -137,7 +140,6 @@ if (!exists) {
 } else {
   console.log('Found data file.');
 }
-
 
 
 
