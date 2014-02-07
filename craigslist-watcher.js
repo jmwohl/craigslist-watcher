@@ -11,8 +11,8 @@ var craigslistscraper = require('./craigslist-scraper'),
 
 // Variables
 var baseUrl = '',
-  mailSenderEmail = config.smtp.address,
-  mailSenderPass = config.smtp.pass,
+  mailSenderEmail = config.from.email,
+  mailSenderPass = config.from.pass,
   notifyEmail = config.to.email,
   queries = []; // Search string,
 queryResults = [],
