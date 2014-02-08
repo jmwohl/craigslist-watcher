@@ -1,7 +1,7 @@
 var config = {};
 
-config.smtp = {
-	address: 'example@example.com',
+config.from = {
+	email: 'example@example.com',
 	pass: 'password'
 };
 
