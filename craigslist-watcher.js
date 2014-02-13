@@ -1,5 +1,6 @@
 process.chdir(__dirname);
 
+// If the config file is not at ./config, it should be specified as the first argument to the script
 var configPath = process.argv[2] || './config';
 
 // Modules
@@ -14,17 +15,17 @@ var baseUrl = '',
   mailSenderEmail = config.from.email,
   mailSenderPass = config.from.pass,
   notifyEmail = config.to.email,
-  queries = []; // Search string,
-queryResults = [],
-dataPath = '',
-dataDirName = 'craigslist-watcher',
-dataFileName = 'data',
-dataFilePath = '',
-filename = __filename.replace(/.*\//, ''),
-usage = '\ncraigslist-watcher - check Craigslist for new posts based on search terms and email new posts\n';
+  queries = [], // Search string,
+  queryResultSets = [],
+  dataPath = '',
+  dataDirName = 'craigslist-watcher',
+  dataFileName = 'data',
+  dataFilePath = '',
+  filename = __filename.replace(/.*\//, ''),
+  usage = '\ncraigslist-watcher - check Craigslist for new posts based on search terms and email new posts\n';
 
 
-usage = usage + 'Usage: craigslist-watcher [options] CITY_SUBDOMAIN SENDER_EMAIL SENDER_PASS NOTIFY_EMAIL SEARCH_STRINGS...';
+usage = usage + 'Usage: craigslist-watcher [options] CONFIG_PATH';
 
 // Functions
 
@@ -32,35 +33,53 @@ function isEmpty(str) {
   return (!str || 0 === str.length);
 }
 
-function emailResults(results) {
-  var datafile = fs.readFileSync(dataFilePath, 'utf8');
-  var dataArr = (isEmpty(datafile) ? [] : JSON.parse(datafile));
-  var emailMessage = 'The following craigslist posts are new:\n';
+/**
+ * Given a result object, create some html of the results.
+ * @param  {Array} results
+ * @return {String}
+ */
+function createResultHtml(termResultSet) {
+  var html = '<h2>Results for <span style="color:#000099">' 
+              + termResultSet.term + '</span> in <span style="color:#000099">' 
+              + termResultSet.location + '</span></h2>';
+
+  for (var i = 0; i < termResultSet.rows.length; i++) {
+    html += '<p>' + termResultSet.rows[i].date + ' - ' + '<a href="' + termResultSet.rows[i].href + '">' + termResultSet.rows[i].text + '</a> - ';
+    html += termResultSet.rows[i].price + ' ' + termResultSet.rows[i].loc + '</p>';
+  }
+
+  return html;
+}
+
+/**
+ * Email the new result sets to the specified user.
+ * @param  {Array} resultSets The array of result sets
+ */
+function emailResults(resultSets) {
+  var emailMessage = 'The following craigslist posts are new:\n',
+    mailOptions = {
+      from: mailSenderEmail, // sender address
+      to: notifyEmail, // list of receivers
+      subject: 'Craigslist Updates',
+    },
+    transportOptions = {
+      service: 'Gmail',
+      auth: {
+        user: mailSenderEmail,
+        pass: mailSenderPass
+      }
+    },
+    smtpTransport = nodemailer.createTransport('SMTP', transportOptions);
+
   // Create email string
-  for (var i = 0; i < results.length; i++) {
-    emailMessage += '<p>' + results[i].date + ' - ' + '<a href="' + results[i].href + '">' + results[i].text + '</a> - ';
-    emailMessage += results[i].price + ' ' + results[i].loc + '</p>';
-  }
-
-  // setup e-mail options
-  mailOptions = {
-    from: mailSenderEmail, // sender address
-    to: notifyEmail, // list of receivers
-    subject: 'Craigslist Updates', // Subject line
-    //text: emailMessage, // plaintext body
-    html: emailMessage
-  }
-
-  transportOptions = {
-    service: 'Gmail',
-    auth: {
-      user: mailSenderEmail,
-      pass: mailSenderPass
+  for (var i = 0; i < resultSets.length; i++) {
+    if (resultSets[i].rows.length > 0) {
+      emailMessage += createResultHtml(resultSets[i]);
     }
   }
 
-  // create reusable transport method (opens pool of SMTP connections)
-  smtpTransport = nodemailer.createTransport('SMTP', transportOptions);
+  // add html to mail options
+  mailOptions.html = emailMessage;
 
   // email results. If email fails, do not add results to data file
   smtpTransport.sendMail(mailOptions, function(error, response) {
@@ -68,42 +87,75 @@ function emailResults(results) {
       console.log('Message failed: ' + error);
     } else {
       console.log('Message sent: ' + response.message);
-      // add new results to datafile
-      for (var i = 0; i < results.length; i++) {
-        dataArr.push(results[i]);
-      }
-      var jsonResults = JSON.stringify(dataArr);
-      fs.writeFileSync(dataFilePath, jsonResults);
+      updateDataFile(resultSets);
     }
-
     smtpTransport.close(); // shut down the connection pool, no more messages
   });
 }
 
+
+function updateDataFile(resultSets) {
+  var datafile = fs.readFileSync(dataFilePath, 'utf8'),
+    dataArr = (isEmpty(datafile) ? [] : JSON.parse(datafile));
+    // add new results to datafile
+  for (var i = 0; i < resultSets.length; i++) {
+    var resultSetRows = resultSets[i].rows;
+    for (var j = 0; j < resultSetRows.length; j++) {
+      dataArr.push(resultSetRows[j]);
+    }
+    var jsonResults = JSON.stringify(dataArr);
+    fs.writeFileSync(dataFilePath, jsonResults);
+  }
+}
+
 // Searches for each query in data file and compiles results
 function processResults() {
-  var datafile = fs.readFileSync(dataFilePath, 'utf8');
-  var dataArr = (isEmpty(datafile) ? [] : JSON.parse(datafile));
-  var results = [];
-
-  // Search for each query and compile results
   console.log('Processing results...');
-  for (var i = 0; i < queryResults.length; i++) {
-    var match = false;
-    for (var j = 0; j < dataArr.length; j++) {
-      if (queryResults[i].href === dataArr[j].href) {
-        match = true;
-        break;
+
+  var datafile = fs.readFileSync(dataFilePath, 'utf8'),
+    dataArr = (isEmpty(datafile) ? [] : JSON.parse(datafile)),
+    finalResults = [],
+    mailIt = false;
+
+  // 1. Loop through each queryResult object
+  // 2. Loop through each interior results array
+  // 3. If the result is already in the data file, remove it from the results
+  // 4. If there are > 0 results left, shoot the email out
+
+  // Loop through each queryResult
+  for (var i = 0; i < queryResultSets.length; i++) {
+    var match = false,
+      result = {
+        term: queryResultSets[i].term,
+        location: queryResultSets[i].location,
+        rows: []
+      };
+
+    finalResults.push(result);
+
+    // Loop through each row in each query result
+    for (var k = 0; k < queryResultSets[i].rows.length; k++) {
+
+      // see if this record is in the data file
+      for (var j = 0; j < dataArr.length; j++) {
+        if (queryResultSets[i].rows[k].href === dataArr[j].href) {
+          match = true;
+          break;
+        }
       }
-    }
-    if (!match) {
-      results.push(queryResults[i]); // no match so add to results
+
+      // if it hasn't been found in the data file, include it in the results and set mailIt to true
+      if (!match) {
+        mailIt = true;
+        result.rows.push(queryResultSets[i].rows[k]); // no match so add to results
+      }
     }
   }
 
-  if (results.length > 0) {
-    console.log('Found ' + results.length + 'new results');
-    emailResults(results);
+
+  if (mailIt) {
+    // console.log('Found ' + results.length + 'new results');
+    emailResults(finalResults);
   } else {
     console.log('No new results');
   }
@@ -144,21 +196,25 @@ if (!exists) {
 
 
 // Run queries with craigslistscraper
-async.each(config.searches, function(q, callback) {
-  baseUrl = 'http://' + q.location + '.craigslist.org';
-  // default to not include nearby
-  includeNearby = q.nearby || false;
-  // default to for sale categories
-  category = q.category || "sss";
-  craigslistscraper.query(baseUrl, category, q.term, includeNearby, function(results) {
-    queryResults.push({
-      date: results.date,
-      text: results.text,
-      href: results.href,
-      price: results.price,
-      loc: results.loc
-    });
+async.each(config.searches, function(search, callback) {
+  var baseUrl = 'http://' + search.location + '.craigslist.org',
+    // default to not include nearby
+    includeNearby = search.nearby || false,
+    // default to for sale categories
+    category = search.category || "sss",
+    results = [];
+
+  queryResultSets.push({
+    term: search.term,
+    location: search.location,
+    rows: results
+  });
+
+  craigslistscraper.query(baseUrl, category, search.term, includeNearby, function(result) {
+    // console.log(result);
+    results.push(result);
   }, callback);
+
 }, function(err) {
   if (!isEmpty(err)) {
     console.error('Error while querying:' + err);

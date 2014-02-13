@@ -5,7 +5,9 @@ var querystring = require("querystring");
 exports.query = function(baseUrl, category, searchString, includeNearby, resultProcessor, callback) {
   var self = this;
   baseUrl = baseUrl.replace(/\/$/, '');
-  searchUrl = baseUrl + '/search/' + category + '?' + querystring.stringify({ query: searchString });
+  searchUrl = baseUrl + '/search/' + category + '?' + querystring.stringify({
+    query: searchString
+  });
 
   request({
     uri: searchUrl
@@ -14,7 +16,7 @@ exports.query = function(baseUrl, category, searchString, includeNearby, resultP
 
     // console.log(body);
     var count = 0;
-    console.log($('#toc_rows h4.nearby').text());
+    // console.log($('#toc_rows h4.nearby').text());
     $('#toc_rows p.row').each(function() {
       count += 1;
       var row = $(this);
@@ -30,15 +32,25 @@ exports.query = function(baseUrl, category, searchString, includeNearby, resultP
       // TODO: flag if nearby results should be included
       if (href.match(/^(\/|\.\.\/)/)) {
         href = baseUrl + href;
-      } else {
-        if (!includeNearby) {
-          return false;
-        }
+      } else if (!includeNearby) {ƒ
+        return false;
       }
+
       // console.log({date: date, text: text, href: href, price: price, loc: loc});
-      resultProcessor({date: date, text: text, href: href, price: price, loc: loc});
+      resultProcessor({
+        date: date,
+        text: text,
+        href: href,
+        price: price,
+        loc: loc
+      });
+
     });
+
     console.log("TOTAL RESULTS: ", count);
-    callback();
+    
+    if (callback) {
+      callback();     
+    }
   });
 }
