@@ -10,10 +10,10 @@ config.to = {
 };
 
 config.searches = [{
-	location: 'newyork',
-	category: 'zip',
-	term: 'cubicle',
-	nearby: true
+	location: 'newyork',	// location to search
+	category: 'zip',		// cl code for the category (zip is free) - defaults to 'sss' (all for sale)
+	term: 'cubicle',		// term to search on
+	nearby: true			// include nearby results? - defaults to false
 }];
 
 module.exports = config;
